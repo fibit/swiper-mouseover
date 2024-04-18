@@ -1,0 +1,23 @@
+{
+  "name": "swiper-mouseover",
+  "version": "1.0.2",
+  "description": "Mouseover plugin for Swiper",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fibit/swiper-mouseover.git"
+  },
+  "keywords": [
+    "swiper",
+    "swiper-js",
+    "swiper-slider"
+  ],
+  "author": "Pavel Romanov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fibit/swiper-mouseover/issues"
+  },
+  "homepage": "https://github.com/fibit/swiper-mouseover#readme"
+}

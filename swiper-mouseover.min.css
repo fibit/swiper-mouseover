@@ -1,0 +1,6 @@
+/**
+ * Swiper-Mouseover v1.0.2 for Swiper (https://github.com/fibit/swiper-mouseover)
+ * Author Pavel Romanov
+ * Released under the MIT License
+ */
+.swiper-mouseover{display:flex;position:absolute;inset:0;z-index:11}.swiper-mouseover-layer{flex:1 0 0%;height:100%}
