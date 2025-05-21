@@ -44,7 +44,8 @@ or use CDN:
 const swiper = new Swiper('.mySwiper', {
   modules: [MouseoverPlugin],
   mouseover: {
-    el: '.swiper-mouseover'
+    el: '.swiper-mouseover',
+    reset: true // reset to first slide on mouseout
   }
 });
 ```

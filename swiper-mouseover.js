@@ -1,63 +1,93 @@
 /**
- * Swiper-Mouseover v2.0.1 for Swiper (https://github.com/fibit/swiper-mouseover)
+ * Swiper-Mouseover v2.1.0 for Swiper (https://github.com/fibit/swiper-mouseover)
  * Author Pavel Romanov
  * Released under the MIT License
  */
 function MouseoverPlugin({ swiper, extendParams, on }) {
+  const CLASS_LAYER = 'swiper-mouseover-layer';
+  
   extendParams({
     mouseover: {
-      el: null
+      el: null,
+      reset: true
     }
   });
 
+  const resolveElement = (selector) => {
+    return typeof selector === 'string' 
+      ? document.querySelector(selector) 
+      : selector;
+  };
+
+  const isTouchDevice = () => 'ontouchstart' in window;
+
+  const createMouseHandler = (slideToIndex) => function(slideIndex) {
+    return function() {
+      swiper.slideTo(slideToIndex ?? slideIndex, swiper.params.speed);
+    };
+  };
+
+  const cleanupLayers = (container) => {
+    const layers = container.querySelectorAll(`.${CLASS_LAYER}`);
+    layers.forEach(layer => {
+      const mouseOverHandler = layer._mouseOverHandler;
+      const mouseOutHandler = layer._mouseOutHandler;
+
+      if (mouseOverHandler) {
+        layer.removeEventListener('mouseover', mouseOverHandler);
+      }
+      if (mouseOutHandler) {
+        layer.removeEventListener('mouseout', mouseOutHandler);
+      }
+
+      delete layer._mouseOverHandler;
+      delete layer._mouseOutHandler;
+    });
+    container.innerHTML = '';
+  };
+
+  const createLayers = (container) => {
+    swiper.snapGrid.forEach((_, index) => {
+      const layer = document.createElement('div');
+      layer.className = CLASS_LAYER;
+      container.appendChild(layer);
+
+      const mouseOverHandler = createMouseHandler()(index);
+      layer._mouseOverHandler = mouseOverHandler;
+      layer.addEventListener('mouseover', mouseOverHandler);
+      
+      if (swiper.params.mouseover.reset) {
+        const mouseOutHandler = createMouseHandler(0)(index);
+        layer._mouseOutHandler = mouseOutHandler;
+        layer.addEventListener('mouseout', mouseOutHandler);
+      }
+    });
+  };
+
   const initMouseover = () => {
     const { el } = swiper.params.mouseover;
-    
     if (!el) return;
     
-    const mouseoverEl = typeof el === 'string' 
-      ? document.querySelector(el) 
-      : el;
-    
+    const mouseoverEl = resolveElement(el);
     if (!mouseoverEl) return;
 
-    if ('ontouchstart' in window) {
+    if (isTouchDevice()) {
       mouseoverEl.remove();
       return;
     }
 
-    mouseoverEl.innerHTML = '';
+    cleanupLayers(mouseoverEl);
+    createLayers(mouseoverEl);
+  };
 
-    mouseoverEl.querySelectorAll('.swiper-mouseover-layer').forEach(el => {
-      el.removeEventListener('mouseover', handleMouseOver);
-      el.removeEventListener('mouseout', handleMouseOut);
-    });
-
-    for (let i = 0; i < swiper.snapGrid.length; i++) {
-      const layer = document.createElement('div');
-      layer.className = 'swiper-mouseover-layer';
-      layer.setAttribute('data-swiper-slide-index', i);
-      mouseoverEl.appendChild(layer);
-      layer.addEventListener('mouseover', handleMouseOver);
-      layer.addEventListener('mouseout', handleMouseOut);
-    }
-
-    function handleMouseOver() {
-      const slideIndex = parseInt(this.getAttribute('data-swiper-slide-index'));
-      swiper.slideTo(slideIndex, swiper.params.speed);
-    }
-
-    function handleMouseOut() {
-      swiper.slideTo(0, swiper.params.speed);
+  const cleanup = () => {
+    const { el } = swiper.params.mouseover;
+    if (el) {
+      const mouseoverEl = resolveElement(el);
+      if (mouseoverEl) mouseoverEl.remove();
     }
   };
 
   on('afterInit', initMouseover);
-  on('destroy', () => {
-    const { el } = swiper.params.mouseover;
-    if (el) {
-      const mouseoverEl = typeof el === 'string' ? document.querySelector(el) : el;
-      if (mouseoverEl) mouseoverEl.remove();
-    }
-  });
-};
+  on('destroy', cleanup);
+}

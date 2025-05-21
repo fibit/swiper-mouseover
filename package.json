@@ -1,6 +1,6 @@
 {
   "name": "swiper-mouseover",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Mouseover plugin for Swiper",
   "files": [
     "swiper-mouseover.js",
