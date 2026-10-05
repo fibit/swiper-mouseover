@@ -15,7 +15,16 @@ Pull-in a latest version with NPM:
 ```
 npm i swiper-mouseover
 ```
-and provide <link> to the required:
+and import it (ESM build `swiper-mouseover.mjs`):
+```js
+import MouseoverPlugin from 'swiper-mouseover';
+import 'swiper-mouseover/swiper-mouseover.min.css';
+```
+or require it (CommonJS):
+```js
+const MouseoverPlugin = require('swiper-mouseover');
+```
+or provide <link> to the required:
 ```html
 <link href="/path/to/swiper-mouseover.min.css" rel="stylesheet">
 <script src="/path/to/swiper-mouseover.min.js"></script>

@@ -1,93 +1,120 @@
 /**
- * Swiper-Mouseover v2.1.0 for Swiper (https://github.com/fibit/swiper-mouseover)
+ * Swiper-Mouseover v2.2.0 for Swiper (https://github.com/fibit/swiper-mouseover)
  * Author Pavel Romanov
  * Released under the MIT License
  */
-function MouseoverPlugin({ swiper, extendParams, on }) {
-  const CLASS_LAYER = 'swiper-mouseover-layer';
-  
-  extendParams({
-    mouseover: {
-      el: null,
-      reset: true
-    }
-  });
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    const plugin = factory();
 
-  const resolveElement = (selector) => {
-    return typeof selector === 'string' 
-      ? document.querySelector(selector) 
-      : selector;
-  };
+    module.exports = plugin;
+    module.exports.MouseoverPlugin = plugin;
+    module.exports.default = plugin;
+  } else if (typeof define === 'function' && define.amd) {
+    define([], factory);
+  } else {
+    root.MouseoverPlugin = factory();
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
 
-  const isTouchDevice = () => 'ontouchstart' in window;
+  function MouseoverPlugin({ swiper, extendParams, on }) {
+    const CLASS_LAYER = 'swiper-mouseover-layer';
 
-  const createMouseHandler = (slideToIndex) => function(slideIndex) {
-    return function() {
-      swiper.slideTo(slideToIndex ?? slideIndex, swiper.params.speed);
+    extendParams({
+      mouseover: {
+        el: null,
+        reset: true
+      }
+    });
+
+    const resolveElement = (selector) => {
+      return typeof selector === 'string'
+        ? document.querySelector(selector)
+        : selector;
     };
-  };
 
-  const cleanupLayers = (container) => {
-    const layers = container.querySelectorAll(`.${CLASS_LAYER}`);
-    layers.forEach(layer => {
-      const mouseOverHandler = layer._mouseOverHandler;
-      const mouseOutHandler = layer._mouseOutHandler;
+    const isTouchDevice = () => {
+      if (typeof window.matchMedia === 'function') {
+        const hoverNone = window.matchMedia('(hover: none)').matches;
+        const hoverHover = window.matchMedia('(hover: hover)').matches;
 
-      if (mouseOverHandler) {
-        layer.removeEventListener('mouseover', mouseOverHandler);
-      }
-      if (mouseOutHandler) {
-        layer.removeEventListener('mouseout', mouseOutHandler);
+        if (hoverNone || hoverHover) return hoverNone;
       }
 
-      delete layer._mouseOverHandler;
-      delete layer._mouseOutHandler;
-    });
-    container.innerHTML = '';
-  };
+      return 'ontouchstart' in window;
+    };
 
-  const createLayers = (container) => {
-    swiper.snapGrid.forEach((_, index) => {
-      const layer = document.createElement('div');
-      layer.className = CLASS_LAYER;
-      container.appendChild(layer);
+    const createMouseHandler = (slideToIndex) => function(slideIndex) {
+      return function() {
+        swiper.slideTo(slideToIndex ?? slideIndex, swiper.params.speed);
+      };
+    };
 
-      const mouseOverHandler = createMouseHandler()(index);
-      layer._mouseOverHandler = mouseOverHandler;
-      layer.addEventListener('mouseover', mouseOverHandler);
-      
-      if (swiper.params.mouseover.reset) {
-        const mouseOutHandler = createMouseHandler(0)(index);
-        layer._mouseOutHandler = mouseOutHandler;
-        layer.addEventListener('mouseout', mouseOutHandler);
-      }
-    });
-  };
+    const cleanupLayers = (container) => {
+      const layers = container.querySelectorAll(`.${CLASS_LAYER}`);
+      layers.forEach(layer => {
+        const mouseOverHandler = layer._mouseOverHandler;
+        const mouseOutHandler = layer._mouseOutHandler;
 
-  const initMouseover = () => {
-    const { el } = swiper.params.mouseover;
-    if (!el) return;
-    
-    const mouseoverEl = resolveElement(el);
-    if (!mouseoverEl) return;
+        if (mouseOverHandler) {
+          layer.removeEventListener('mouseover', mouseOverHandler);
+        }
+        if (mouseOutHandler) {
+          layer.removeEventListener('mouseout', mouseOutHandler);
+        }
 
-    if (isTouchDevice()) {
-      mouseoverEl.remove();
-      return;
-    }
+        delete layer._mouseOverHandler;
+        delete layer._mouseOutHandler;
+      });
+      container.innerHTML = '';
+    };
 
-    cleanupLayers(mouseoverEl);
-    createLayers(mouseoverEl);
-  };
+    const createLayers = (container) => {
+      swiper.snapGrid.forEach((_, index) => {
+        const layer = document.createElement('div');
+        layer.className = CLASS_LAYER;
+        container.appendChild(layer);
 
-  const cleanup = () => {
-    const { el } = swiper.params.mouseover;
-    if (el) {
+        const mouseOverHandler = createMouseHandler()(index);
+        layer._mouseOverHandler = mouseOverHandler;
+        layer.addEventListener('mouseover', mouseOverHandler);
+
+        if (swiper.params.mouseover.reset) {
+          const mouseOutHandler = createMouseHandler(0)(index);
+          layer._mouseOutHandler = mouseOutHandler;
+          layer.addEventListener('mouseout', mouseOutHandler);
+        }
+      });
+    };
+
+    const initMouseover = () => {
+      const { el } = swiper.params.mouseover;
+      if (!el) return;
+
       const mouseoverEl = resolveElement(el);
-      if (mouseoverEl) mouseoverEl.remove();
-    }
-  };
+      if (!mouseoverEl) return;
 
-  on('afterInit', initMouseover);
-  on('destroy', cleanup);
-}
+      if (isTouchDevice()) {
+        mouseoverEl.remove();
+        return;
+      }
+
+      cleanupLayers(mouseoverEl);
+      createLayers(mouseoverEl);
+    };
+
+    const cleanup = () => {
+      const { el } = swiper.params.mouseover;
+      if (el) {
+        const mouseoverEl = resolveElement(el);
+        if (mouseoverEl) mouseoverEl.remove();
+      }
+    };
+
+    on('afterInit', initMouseover);
+    on('destroy', cleanup);
+  }
+
+  return MouseoverPlugin;
+});

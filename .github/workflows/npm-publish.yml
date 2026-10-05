@@ -13,6 +13,8 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      - run: npm run build
+      - run: git diff --exit-code -- swiper-mouseover.min.js swiper-mouseover.min.css swiper-mouseover.mjs
       - run: npm test
 
   publish-npm:

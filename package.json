@@ -1,15 +1,37 @@
 {
   "name": "swiper-mouseover",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Mouseover plugin for Swiper",
   "files": [
     "swiper-mouseover.js",
     "swiper-mouseover.min.js",
+    "swiper-mouseover.mjs",
     "swiper-mouseover.css",
     "swiper-mouseover.min.css"
   ],
+  "main": "swiper-mouseover.js",
+  "module": "swiper-mouseover.mjs",
+  "style": "swiper-mouseover.css",
+  "exports": {
+    ".": {
+      "import": "./swiper-mouseover.mjs",
+      "require": "./swiper-mouseover.js",
+      "default": "./swiper-mouseover.js"
+    },
+    "./swiper-mouseover.js": "./swiper-mouseover.js",
+    "./swiper-mouseover.min.js": "./swiper-mouseover.min.js",
+    "./swiper-mouseover.mjs": "./swiper-mouseover.mjs",
+    "./swiper-mouseover.css": "./swiper-mouseover.css",
+    "./swiper-mouseover.min.css": "./swiper-mouseover.min.css",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
-    "test": "echo \"Tests skipped\" && exit 0"
+    "build": "node scripts/build.mjs",
+    "test": "echo \"Tests skipped\" && exit 0",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -32,5 +54,8 @@
   "homepage": "https://github.com/fibit/swiper-mouseover#readme",
   "peerDependencies": {
     "swiper": ">=11.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
   }
 }
